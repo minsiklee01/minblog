@@ -24,7 +24,6 @@ export function SessionProvider({ children }: { children: React.ReactNode}) {
 
       supabase.auth.onAuthStateChange((_event, session) => {
         setSession(session)
-        if (session) router.replace('/admin')
       })
     }
 

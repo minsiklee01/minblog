@@ -1,4 +1,4 @@
-import  AddButtonIfLoggedIn from '@/components/AddButtonIfLoggedIn'
+import  AddButtonIfLoggedIn from '@/components/BlogAction'
 import prisma from '../../../lib/prisma'
 import Link from 'next/link'
 
