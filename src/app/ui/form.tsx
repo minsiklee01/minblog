@@ -19,22 +19,37 @@ export default function PostForm({ post }: { post?: PostWithCategories }) {
     }
   }, [post]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent, isDraft: boolean) {
     e.preventDefault();
-    const payload = { title, content, category };
-
-    await fetch(post ? `/api/edit/${post.id}` : '/api/post', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
+    if (!post) {
+      // POST
+      const body = { 
+        title, 
+        slug: title.toLowerCase().replace(/\s+/g, '-'),
+        content,
+        category,
+        published: !isDraft,
+      };
+      await fetch('/api/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    } else {
+      // PUT
+      const payload = { title, content, category, published: !isDraft };
+      await fetch(`/api/post/${post.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
     window.location.href = '/blog';
   }
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={e => handleSubmit(e,false)}>
         <h1>{post ? 'Edit Post' : 'New Draft'}</h1>
         <select
           value={category}
@@ -64,6 +79,11 @@ export default function PostForm({ post }: { post?: PostWithCategories }) {
           className='border-2 border-solid'
         /><br />
         <input disabled={!content || !title} type="submit" value={post ? 'Update' : 'Create'} />
+        <button
+          type="button"
+          disabled={!content || !title}
+          onClick={(e) => handleSubmit(e, true)}
+        >Save Draft</button>
       </form>
       <Link href='/blog'>Cancel</Link>
     </div>

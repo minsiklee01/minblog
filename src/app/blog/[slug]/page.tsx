@@ -2,12 +2,13 @@ import prisma from '@/../lib/prisma'
 import PostAction from '@/app/ui/postAction'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
-export default async function BlogPostPage({ params }: PageProps) {
+export default async function BlogPostPage(props: PageProps) {
+  const params = await props.params;
   const post = await prisma.post.findUnique({
     where: { slug: params.slug }
   })

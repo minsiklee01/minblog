@@ -14,7 +14,9 @@ export default function Drafts({
   let list = (
     <ul>
       {allDrafts.map((draft) => (
-        <Link key={draft.id} href={`/blog/draft/${draft.slug}`}>{draft.title}</Link>
+        <div key={draft.id}>
+          <Link href={`/blog/draft/${draft.slug}`}>{draft.title}</Link>
+        </div>
       ))}
     </ul>
   )

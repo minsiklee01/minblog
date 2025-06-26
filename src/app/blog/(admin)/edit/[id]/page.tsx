@@ -1,10 +1,11 @@
 import prisma from '@/../lib/prisma'
 import PostForm from '@/app/ui/form';
 
-export default async function EditPost({ params }: { params: { id: string }}) {
+export default async function EditPost(props: { params: Promise<{ id: string }>}) {
+  const params = await props.params;
 
   const id = parseInt(params.id);
-  
+
   if (isNaN(id)) {
     return <div>Invalid ID</div>;
   }

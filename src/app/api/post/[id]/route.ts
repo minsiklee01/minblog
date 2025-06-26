@@ -1,10 +1,8 @@
 import prisma from '@/../lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) { 
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const postId = parseInt(params.id);
 
   if (isNaN(postId)) {
@@ -18,25 +16,21 @@ export async function DELETE(
   return NextResponse.json(deleted);
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const postId = parseInt(params.id);
 
   if (isNaN(postId)) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
   }
 
-  const { title, slug, content, category, published } = await req.json();
+  const { title, content, category, published } = await req.json();
 
   const updatedPost = await prisma.post.update({
     where: { id: postId },
     data: {
       title,
-      slug,
       content,
-      published,
       categories: {
         set: [],
         connectOrCreate: category.map((name: string) => ({
@@ -44,8 +38,10 @@ export async function PUT(
           create: { name },
         })),
       },
+      published,
     },
   });
 
   return NextResponse.json(updatedPost);
 }
+
