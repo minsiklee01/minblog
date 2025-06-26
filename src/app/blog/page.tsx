@@ -12,9 +12,11 @@ export default async function Page() {
       <AddButtonIfLoggedIn />
       <div>
         {feed.map((post) => (
-          <Link key={post.id} href={`/blog/${post.slug}`}>
-            {post.title}
-          </Link>
+          <div key={post.id}>
+            <Link href={`/blog/${post.slug}`}>
+              {post.title}
+            </Link>
+          </div>
         ))}
       </div>
     </div>

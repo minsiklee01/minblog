@@ -1,13 +1,16 @@
 'use client'
 import React, { useState } from 'react';
 import Link from 'next/link'
+import { useRouter } from 'next/navigation';
 
 export default function AddPost() {
   const [title,setTitle] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState<string[]>(['All']);
 
-  const submit = async (e: React.SyntheticEvent) => {
+  const router = useRouter();
+
+  const submit = async (e: React.SyntheticEvent, isDraft: boolean) => {
     e.preventDefault();
     try {
       const body = { 
@@ -15,20 +18,21 @@ export default function AddPost() {
         slug: title.toLowerCase().replace(/\s+/g, '-'),
         content,
         category,
-        published: true,
+        published: !isDraft,
       };
       await fetch('/api/post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
+      router.push('/blog')
     } catch (error) {
       console.error(error);
     }
   }
   return(
     <div>
-      <form onSubmit={submit}>
+      <form onSubmit={(e) => submit(e,false)}>
         <h1>New Draft</h1>
         <select 
           value={category}
@@ -38,14 +42,17 @@ export default function AddPost() {
           }
         >
           <option value="all">All</option>
+          <option value="test">Test</option>
         </select>
+        <br/>
         <input
           autoFocus
           onChange={(e)=>setTitle(e.target.value)}
           placeholder='Title'
           type='text'
+          className='border-2 border-solid'
           value={title}
-        />
+        /><br/>
         <textarea
           cols={50}
           onChange={(e)=>setContent(e.target.value)}
@@ -53,8 +60,15 @@ export default function AddPost() {
           rows={8}
           value={content}
           className='border-2 border-solid'
-        />
+        /><br/>
         <input disabled={!content || !title} type="submit" value="Create" />
+        <button
+          type="button"
+          // disabled={!content || !title}
+          onClick={(e) => submit(e, true)}
+        >
+          Save Draft
+        </button>
       </form>
       <Link href='/blog'>Cancel</Link>
     </div>
