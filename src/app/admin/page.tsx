@@ -1,30 +1,17 @@
-'use client'
+import LoginForm from './loginForm'
+import LogoutButton from './logoutButton'
+import { createClient } from '@/utils/supabase/server'
 
-import GitHubLogin from "@/components/GitHubLogin"
-import { supabase } from '@/../lib/supabaseClient'
-import { useRouter } from 'next/navigation'
-import { useSession } from '@/context/SessionContext'
+export default async function Page() {
 
-export default function Page() {
-  const router = useRouter()
-  const session = useSession()
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.refresh()
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getUser()
+   
+  if (error || !data?.user) {
+    return <LoginForm />
   }
-
-
+  
   return (
-    <div>
-      {session ? (
-        <div>
-          <p>Welcome, admin!</p>
-          <button onClick={handleLogout}>로그아웃</button>
-        </div>
-      ) : (
-        <GitHubLogin />
-      )}
-    </div>
+    <LogoutButton />
   )
 }

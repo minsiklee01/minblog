@@ -1,5 +1,7 @@
+import { createClient } from '@/utils/supabase/server'
 import prisma from '@/../lib/prisma'
 import PostAction from '@/app/ui/postAction'
+import ReactMarkdown from 'react-markdown'
 
 interface PageProps {
   params: Promise<{
@@ -8,6 +10,8 @@ interface PageProps {
 }
 
 export default async function BlogPostPage(props: PageProps) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
   const params = await props.params;
   const post = await prisma.post.findUnique({
     where: { slug: params.slug }
@@ -18,9 +22,13 @@ export default async function BlogPostPage(props: PageProps) {
   }
   return (
     <article>
-      <PostAction postId = {post.id} />
+      { user && <PostAction postId = {post.id}/>}
       <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
-      <div className="prose" dangerouslySetInnerHTML={{ __html: post.content }} />
+      <article className="prose prose-lg dark:prose-invert max-w-none">
+        <ReactMarkdown >
+          {post.content}
+        </ReactMarkdown>
+      </article>
     </article>
   )
 }

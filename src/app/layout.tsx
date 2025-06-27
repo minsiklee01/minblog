@@ -1,6 +1,5 @@
 import './global.css'
 import LayoutWrapper from '../components/LayoutWrapper'
-import { SessionProvider } from '@/context/SessionContext'
 
 export default function RootLayout({
   children,
@@ -10,9 +9,7 @@ export default function RootLayout({
   return (
     <html>
       <body>
-        <SessionProvider>
-          <LayoutWrapper>{children}</LayoutWrapper>
-        </SessionProvider>
+        <LayoutWrapper>{children}</LayoutWrapper>
         </body>
     </html>
   )
