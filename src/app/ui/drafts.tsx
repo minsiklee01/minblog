@@ -1,19 +1,16 @@
 'use client'
 
-import { use } from 'react'
 import { Post } from '@prisma/client'
 import Link from 'next/link'
 
 export default function Drafts({
   drafts,
 }: {
-  drafts: Promise<Post[]>
+  drafts: Post[]
 }) {
-  const allDrafts = use(drafts)
-
   let list = (
     <ul>
-      {allDrafts.map((draft) => (
+      {drafts.map((draft) => (
         <div key={draft.id}>
           <Link href={`/blog/draft/${draft.slug}`}>{draft.title}</Link>
         </div>
@@ -21,7 +18,7 @@ export default function Drafts({
     </ul>
   )
 
-  if (allDrafts.length === 0) {
+  if (drafts.length === 0) {
     list = <p>No draft exists.</p>
   }
 

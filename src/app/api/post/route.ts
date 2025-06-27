@@ -21,9 +21,3 @@ export async function POST(req: Request) {
 
   return NextResponse.json(post)
 }
-
-export function getDrafts() {
-  return prisma.post.findMany({
-    where: { published: false},
-  })
-}
