@@ -1,13 +1,13 @@
 import prisma from '@/../lib/prisma'
 import DraftClient from '@/app/ui/draftClient'
 
-interface PageProps {
-  params: { slug: string }
-}
+type Props = {
+  params: Promise<{ slug: string }>;
+};
 
-export default async function DraftPage({ params }: PageProps) {
+export default async function DraftPage({ params }: Props) {
 
-  const { slug } = await params
+  const { slug } = await params;
 
   const post = await prisma.post.findUnique({
     where: { slug: slug }
