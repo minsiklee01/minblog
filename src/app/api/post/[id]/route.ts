@@ -32,11 +32,10 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
       title,
       content,
       categories: {
-        set: [],
-        connectOrCreate: category.map((name: string) => ({
-          where: { name },
-          create: { name },
-        })),
+        connectOrCreate: {
+          where: { name: category },
+          create: { name: category },
+        },
       },
       published,
     },

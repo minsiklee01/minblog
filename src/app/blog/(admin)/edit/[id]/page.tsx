@@ -21,6 +21,6 @@ export default async function EditPost(props: { params: Promise<{ id: string }>}
   }
 
   return(
-    <PostForm post={post} />
+    <PostForm post={post} categories={post.categories}/>
   )
 }

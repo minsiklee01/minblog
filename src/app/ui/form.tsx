@@ -1,32 +1,45 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Post, Category } from '@prisma/client';
-import Link from 'next/link';
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm'
+import Link from 'next/link';
 
-type PostWithCategories = Post & { categories: Category[] };
+type FormProps = {post?: Post, categories: Category[]}
 
-export default function PostForm({ post }: { post?: PostWithCategories }) {
+export default function PostForm({ post, categories }: FormProps ) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState<string[]>([]);
+  const [category, setCategory] = useState('All');
   const [markdown, setMarkdown] = useState("")
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (post) {
       setTitle(post.title);
       setContent(post.content);
-      setCategory(post.categories.map((c) => c.name));
     }
-  }, [post]);
+    setCategory(categories[0].name);
+  }, [post, categories]);
 
-const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-  const value = e.target.value;
-  setMarkdown(value);
-  setContent(value);
-}
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setMarkdown(value);
+    setContent(value);
+    scrollPreviewToBottom();
+  }
 
   async function handleSubmit(e: React.FormEvent, isDraft: boolean) {
     e.preventDefault();
@@ -56,50 +69,62 @@ const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     window.location.href = '/blog';
   }
 
+  const scrollPreviewToBottom = () => {
+    const div = previewRef.current;
+    if (div) {
+      div.scrollTop = div.scrollHeight;
+    }
+  };
+
   return (
-    <div className="flex h-[600px]">
+    <div className="flex w-full h-dvh">
       <form 
         onSubmit={e => handleSubmit(e,false)}
-        className="w-1/2 p-4 border overflow-auto flex flex-col gap-2"
+        className="w-1/2 flex flex-col gap-3 p-6 h-full"
       >
         <h1>{post ? 'Edit Post' : 'New Draft'}</h1>
-        <select
-          value={category}
-          multiple
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            setCategory(Array.from(e.target.selectedOptions, option => option.value))
-          }
-        >
-          <option value="all">All</option>
-          <option value="test">Test</option>
-        </select>
-        <input
-          autoFocus
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder='Title'
-          type='text'
-          className='border-2 border-solid'
+        <Select value={category} onValueChange={setCategory}>
+          <SelectTrigger className="w-[280px]">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((c) => (
+              <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input 
+          type="text" 
+          placeholder="Title" 
+          onChange={(e) => setTitle(e.target.value)} 
           value={title}
-        />
-        <textarea
-          onChange={handleInput}
-          placeholder='Content'
-          rows={8}
+          className='h-1/12 text-3xl'
+          />
+        <Textarea 
+          placeholder="Enter content here." 
           value={content}
-          className='border-2 border-solid'
+          onChange={handleInput}
+          className="flex-1 resize-none"
         />
-        <div className="flex gap-2">
-          <input disabled={!content || !title} type="submit" value={post ? 'Update' : 'Create'} />
-          <button
-            type="button"
-            disabled={!content || !title}
-            onClick={(e) => handleSubmit(e, true)}
-          >Save Draft</button>
+        <div className="flex justify-between">
+          <Link href='/blog'>Cancel</Link>
+          <div className='flex gap-3'>
+            <button
+              type="button"
+              disabled={!content || !title}
+              onClick={(e) => handleSubmit(e, true)}
+            >Save Draft</button>
+            <input disabled={!content || !title} type="submit" value={post ? 'Update' : 'Create'} />
+          </div>
         </div>
-        <Link href='/blog'>Cancel</Link>
       </form>
-      <div className="w-1/2 p-4 border overflow-auto prose h-full ">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+      <div 
+        ref={previewRef}
+        className="w-1/2 p-4 h-full overflow-auto bg-gray-100"
+      >
+        <span className="prose">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+        </span>
       </div>
     </div>
   );

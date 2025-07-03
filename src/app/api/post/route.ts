@@ -10,11 +10,11 @@ export async function POST(req: Request) {
       slug,
       content,
       published,
-      categories: { 
-        connectOrCreate: category.map((name: string) => ({
-          where: { name },
-          create: { name },
-        })),
+      categories: {
+        connectOrCreate: {
+          where: { name: category },
+          create: { name: category },
+        },
       },
     },
   })
