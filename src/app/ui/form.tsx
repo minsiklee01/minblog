@@ -17,7 +17,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm'
 import Link from 'next/link';
 
-type FormProps = {post?: Post, categories: Category[]}
+type FormProps = {
+  post?: Post & { categories: { id: number; name: string }[] }, 
+  categories: Category[]
+}
 
 export default function PostForm({ post, categories }: FormProps ) {
   const [title, setTitle] = useState('');
@@ -30,6 +33,7 @@ export default function PostForm({ post, categories }: FormProps ) {
     if (post) {
       setTitle(post.title);
       setContent(post.content);
+      setCategory(post.categories[0].name);
     }
     setCategory(categories[0].name);
   }, [post, categories]);

@@ -32,10 +32,8 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
       title,
       content,
       categories: {
-        connectOrCreate: {
-          where: { name: category },
-          create: { name: category },
-        },
+        set: [],
+        connect: [{ name: category }],
       },
       published,
     },

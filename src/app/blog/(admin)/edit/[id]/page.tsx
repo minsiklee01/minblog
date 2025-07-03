@@ -14,6 +14,7 @@ export default async function EditPost(props: { params: Promise<{ id: string }>}
     where: { id: id },
     include: { categories: true }
   })
+  const categories = await prisma.category.findMany()
 
   if (!post) {
     console.error('Post not found');
@@ -21,6 +22,6 @@ export default async function EditPost(props: { params: Promise<{ id: string }>}
   }
 
   return(
-    <PostForm post={post} categories={post.categories}/>
+    <PostForm post={post} categories={categories}/>
   )
 }
