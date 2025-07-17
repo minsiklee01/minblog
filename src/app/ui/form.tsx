@@ -29,14 +29,17 @@ export default function PostForm({ post, categories }: FormProps ) {
   const [markdown, setMarkdown] = useState("")
   const previewRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (post) {
-      setTitle(post.title);
-      setContent(post.content);
+useEffect(() => {
+  if (post) {
+    setTitle(post.title);
+    setContent(post.content);
+    if (post.categories.length > 0) {
       setCategory(post.categories[0].name);
     }
-    setCategory(categories[0].name);
-  }, [post, categories]);
+  } else {
+    setCategory(categories[0]?.name || '');
+  }
+}, [post, categories]);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -111,14 +114,22 @@ export default function PostForm({ post, categories }: FormProps ) {
           className="flex-1 resize-none"
         />
         <div className="flex justify-between">
-          <Link href='/blog'>Cancel</Link>
+          <Link href='/blog' className='text-red-600'>Cancel</Link>
           <div className='flex gap-3'>
             <button
               type="button"
               disabled={!content || !title}
               onClick={(e) => handleSubmit(e, true)}
             >Save Draft</button>
-            <input disabled={!content || !title} type="submit" value={post ? 'Update' : 'Create'} />
+            <input 
+              disabled={!content || !title || !category} 
+              type="submit" 
+              value={post ? 'Update' : 'Create'} 
+              className={`${!content || !title || !category
+                ? 'text-gray-600 cursor-not-allowed'
+                : 'hover:text-blue-600'
+              }`}
+            />
           </div>
         </div>
       </form>
