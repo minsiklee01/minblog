@@ -7,7 +7,8 @@ type Props = {
 
 export default async function DraftPage({ params }: Props) {
 
-  const { slug } = await params;
+  const { slug: encodedSlug } = await params;
+  const slug = decodeURIComponent(encodedSlug)
 
   const post = await prisma.post.findUnique({
     where: { slug: slug }
